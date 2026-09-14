@@ -129,3 +129,9 @@ def get_summary(
 
     engine = FinancialAnalyticsEngine(transactions)
     return engine.compute_summary()
+
+
+@router.get("/api/analytics/cost", summary="Get real-time cost, token usage, and observability analytics")
+def get_cost_analytics():
+    from app.observability.tracer import cost_store
+    return cost_store.get_summary()

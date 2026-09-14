@@ -105,3 +105,42 @@ def test_upload_and_ask_pdf():
     assert ask_resp.status_code == 200
     assert "get_highest_debit" in ask_resp.json()["tools_used"]
     assert ask_resp.json()["calculation_results"]["get_highest_debit"]["amount"] == 1600.00
+
+
+def test_cost_analytics_endpoint():
+    resp = client.get("/api/analytics/cost")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert "total_requests" in data
+    assert "total_tokens" in data
+    assert "total_cost_usd" in data
+    assert "total_cost_inr" in data
+    assert "total_saved_usd" in data
+    assert "avg_latency_ms" in data
+    assert "traces" in data
+    assert "langfuse" in data
+
+    # Perform an upload and ask to test trace recording
+    csv_path = os.path.join("sample_data", "chase_statement.csv")
+    with open(csv_path, "rb") as f:
+        upload_resp = client.post("/upload", files={"file": ("chase_statement.csv", f, "text/csv")})
+    assert upload_resp.status_code == 200
+    file_id = upload_resp.json()["file_id"]
+
+    ask_resp = client.post("/ask", json={"question": "What is my total debit?", "session_id": file_id})
+    assert ask_resp.status_code == 200
+
+    # Now verify cost analytics has the recorded trace
+    resp2 = client.get("/api/analytics/cost")
+    assert resp2.status_code == 200
+    data2 = resp2.json()
+    assert data2["total_requests"] >= 1
+    assert len(data2["traces"]) >= 1
+    latest_trace = data2["traces"][0]
+    assert "question" in latest_trace
+    assert "tools_used" in latest_trace
+    assert "latency_ms" in latest_trace
+    assert "total_tokens" in latest_trace
+    assert "cost_usd" in latest_trace
+
+

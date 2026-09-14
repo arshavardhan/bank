@@ -2,6 +2,7 @@
 
 import re
 import json
+import time
 import logging
 from typing import Dict, Any, List, Optional
 from langgraph.graph import StateGraph, START, END
@@ -72,12 +73,27 @@ class FinancialAgentOrchestrator:
             "error": None
         }
 
+        start_time = time.time()
         with tracer.trace_span(trace, "langgraph_execution", input_data={"question": question}) as span_ctx:
             final_state = self.graph.invoke(initial_state)
             span_ctx["output"] = {
                 "tools_used": final_state["selected_tools"],
                 "validation_passed": final_state["validation"].is_valid
             }
+        latency_ms = (time.time() - start_time) * 1000.0
+
+        # Record metrics in real-time cost tracker
+        from app.observability.tracer import cost_store
+        model_name = settings.GEMINI_MODEL_NAME if settings.LLM_PROVIDER == "gemini" and settings.GEMINI_API_KEY else (
+            settings.OPENAI_MODEL_NAME if settings.LLM_PROVIDER == "openai" and settings.OPENAI_API_KEY else "local-deterministic"
+        )
+        cost_record = cost_store.record_request(
+            question=question,
+            tools_used=final_state["selected_tools"],
+            latency_ms=latency_ms,
+            model_name=model_name,
+            session_id=session_id
+        )
 
         return AskResponse(
             question=question,
@@ -89,7 +105,8 @@ class FinancialAgentOrchestrator:
             validation=final_state["validation"],
             source_info={
                 "transactions_analyzed": len(transactions),
-                "session_id": session_id
+                "session_id": session_id,
+                "cost_analytics": cost_record
             }
         )
 
