@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Financial Statement Analyst</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen">
+
+  <!-- Navigation Bar -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-blue-500 flex items-center justify-center text-white font-bold text-xl shadow-md shadow-indigo-100">
+          $
+        </div>
+        <div>
+          <h1 class="font-bold text-lg text-slate-900 leading-tight">Financial AI Analyst</h1>
+          <p class="text-xs text-slate-500">Deterministic Financial Intelligence & Statement Insights</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-4">
+        <span id="system-health-badge" class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span>
+          Engine Ready
+        </span>
+        <a href="/docs" target="_blank" class="text-xs font-medium text-slate-500 hover:text-indigo-600 transition">API Docs</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+    <!-- Upload & Quick Start Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      
+      <!-- Upload Card -->
+      <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="text-base font-semibold text-slate-900">Upload Bank Statement</h2>
+            <p class="text-sm text-slate-500">Supports PDF, Excel (.xlsx, .xls), CSV, or scanned statement images</p>
+          </div>
+          <span id="file-status-badge" class="text-xs font-medium px-2.5 py-1 rounded-full bg-slate-100 text-slate-600">No Statement Loaded</span>
+        </div>
+
+        <div id="dropzone" class="border-2 border-dashed border-slate-200 hover:border-indigo-400 rounded-xl p-8 text-center transition cursor-pointer bg-slate-50/50 hover:bg-indigo-50/20">
+          <input type="file" id="file-input" class="hidden" accept=".csv,.xlsx,.xls,.pdf,.png,.jpg,.jpeg">
+          <div class="space-y-3">
+            <div class="w-12 h-12 mx-auto rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+              </svg>
+            </div>
+            <div>
+              <span class="text-sm font-semibold text-indigo-600 hover:underline">Click to browse file</span>
+              <span class="text-sm text-slate-500"> or drag and drop statement here</span>
+            </div>
+            <p class="text-xs text-slate-400">PDF, CSV, XLSX, XLS, JPG, PNG (Max 25MB)</p>
+          </div>
+        </div>
+
+        <!-- Download Sample Datasets Section -->
+        <div class="mt-4 pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center space-x-2">
+            <span class="text-xs font-semibold text-slate-700">📥 Download Suited Datasets:</span>
+            <a href="/sample_data/comprehensive_bank_statement.csv" download class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 transition">
+              📄 6-Mo CSV (57 Txns)
+            </a>
+            <a href="/sample_data/comprehensive_bank_statement.xlsx" download class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 transition">
+              📊 6-Mo Excel (.xlsx)
+            </a>
+            <a href="/sample_data/sample_statement.pdf" download class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 transition">
+              📑 Bank PDF
+            </a>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="text-xs text-slate-400 font-medium">Or 1-click test:</span>
+            <button onclick="loadSample('comprehensive_bank_statement.csv')" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition">Load 6-Mo CSV</button>
+            <button onclick="loadSample('wells_fargo_statement.xlsx')" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition">Wells Fargo</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Core Guarantee Info Card -->
+      <div class="bg-gradient-to-br from-indigo-900 to-slate-900 rounded-2xl p-6 text-white shadow-sm flex flex-col justify-between">
+        <div class="space-y-4">
+          <div class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-indigo-500/20 text-indigo-300 border border-indigo-400/30">
+            Deterministic First
+          </div>
+          <h3 class="text-lg font-bold">Guaranteed Arithmetic Precision</h3>
+          <p class="text-sm text-slate-300 leading-relaxed">
+            The LLM never performs mental math. Every total, merchant sum, and monthly breakdown is calculated deterministically via Python/SQL tools and audited for 100% grounded accuracy.
+          </p>
+        </div>
+        <div class="pt-4 border-t border-slate-800 text-xs text-slate-400 flex items-center justify-between">
+          <span>LangGraph Orchestrator</span>
+          <span class="text-emerald-400">Anti-Hallucination Active</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Summary Metrics Grid -->
+    <div id="summary-section" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+        <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Total Income / Credits</p>
+        <h4 id="stat-credits" class="text-2xl font-bold text-emerald-600 mt-2">$0.00</h4>
+        <p id="stat-credit-count" class="text-xs text-slate-400 mt-1">0 deposits</p>
+      </div>
+
+      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+        <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Total Spent / Debits</p>
+        <h4 id="stat-debits" class="text-2xl font-bold text-rose-600 mt-2">$0.00</h4>
+        <p id="stat-debit-count" class="text-xs text-slate-400 mt-1">0 withdrawals</p>
+      </div>
+
+      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+        <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Net Cash Flow</p>
+        <h4 id="stat-net" class="text-2xl font-bold text-slate-900 mt-2">$0.00</h4>
+        <p id="stat-net-badge" class="text-xs font-medium text-slate-500 mt-1">Balanced</p>
+      </div>
+
+      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+        <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Statement Scope</p>
+        <h4 id="stat-total-txns" class="text-2xl font-bold text-slate-900 mt-2">0</h4>
+        <p id="stat-dates" class="text-xs text-slate-400 mt-1">No dates loaded</p>
+      </div>
+    </div>
+
+    <!-- Interactive AI Analyst Section -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <div class="p-6 border-b border-slate-100">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-base font-semibold text-slate-900">Ask Financial Questions</h2>
+            <p class="text-sm text-slate-500">Ask anything in natural language. Deterministic tools will compute verified answers.</p>
+          </div>
+          <span id="active-session-label" class="text-xs text-slate-400">Upload a statement to begin</span>
+        </div>
+
+        <!-- Quick Question Chips -->
+        <div class="mt-4 flex flex-wrap gap-2">
+          <button onclick="setQuery('What is my total credit and debit?')" class="px-3 py-1.5 rounded-full text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-medium transition">
+            💡 Total Credit & Debit
+          </button>
+          <button onclick="setQuery('How much did I spend on Amazon?')" class="px-3 py-1.5 rounded-full text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-medium transition">
+            🛒 Amazon Spending
+          </button>
+          <button onclick="setQuery('Where did most of my money go?')" class="px-3 py-1.5 rounded-full text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-medium transition">
+            📊 Spending Breakdown
+          </button>
+          <button onclick="setQuery('How much did I spend in January?')" class="px-3 py-1.5 rounded-full text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-medium transition">
+            📅 Monthly Spending
+          </button>
+          <button onclick="setQuery('What are my recurring subscriptions?')" class="px-3 py-1.5 rounded-full text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-medium transition">
+            🔄 Subscriptions & Bills
+          </button>
+          <button onclick="setQuery('Show my top 5 highest transactions')" class="px-3 py-1.5 rounded-full text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-medium transition">
+            🏆 Top 5 Transactions
+          </button>
+        </div>
+
+        <!-- Question Input Bar -->
+        <form id="ask-form" class="mt-4 flex gap-3">
+          <div class="relative flex-1">
+            <input 
+              type="text" 
+              id="question-input" 
+              placeholder="e.g. How much did I spend on food and groceries?" 
+              class="w-full pl-4 pr-10 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm bg-slate-50/50"
+              required
+            >
+          </div>
+          <button 
+            type="submit" 
+            id="ask-btn"
+            class="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold transition flex items-center space-x-2 shadow-sm shadow-indigo-200 disabled:opacity-50"
+          >
+            <span id="ask-btn-text">Ask AI</span>
+            <svg id="ask-spinner" class="hidden animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+            </svg>
+          </button>
+        </form>
+      </div>
+
+      <!-- AI Response Container -->
+      <div id="response-container" class="p-6 bg-slate-50/40 hidden">
+        <div class="bg-white rounded-xl border border-slate-200 p-6 space-y-4">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div class="flex items-center space-x-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+              <span class="text-xs font-semibold text-slate-700">Verified Answer</span>
+              <span id="tools-badge-container" class="flex items-center gap-1.5"></span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span id="audit-badge" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+                ✓ 100% Grounded
+              </span>
+            </div>
+          </div>
+
+          <div id="answer-text" class="prose prose-sm max-w-none text-slate-800 leading-relaxed whitespace-pre-line font-normal">
+          </div>
+
+          <!-- Underlying Tool Calculations Toggle -->
+          <div class="pt-3 border-t border-slate-100">
+            <details class="text-xs text-slate-500 cursor-pointer">
+              <summary class="font-medium hover:text-indigo-600 transition">View Verified Tool Calculations (JSON)</summary>
+              <pre id="raw-calc-output" class="mt-2 p-3 bg-slate-900 text-slate-200 rounded-lg overflow-x-auto text-[11px] font-mono"></pre>
+            </details>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transaction Explorer Table -->
+    <div id="txns-table-container" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden hidden">
+      <div class="p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h3 class="text-base font-semibold text-slate-900">Extracted Transactions</h3>
+          <p class="text-sm text-slate-500">Normalized into unified banking model</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <input 
+            type="text" 
+            id="search-filter" 
+            placeholder="Search merchant or narrative..." 
+            oninput="filterTransactions()"
+            class="px-3 py-2 rounded-lg border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          >
+          <select id="type-filter" onchange="filterTransactions()" class="px-3 py-2 rounded-lg border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option value="">All Types</option>
+            <option value="CREDIT">Credits (Income)</option>
+            <option value="DEBIT">Debits (Expenses)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs text-slate-600">
+          <thead class="bg-slate-50 text-slate-500 uppercase font-semibold text-[11px] border-b border-slate-100">
+            <tr>
+              <th class="px-6 py-3.5">Date</th>
+              <th class="px-6 py-3.5">Merchant / Entity</th>
+              <th class="px-6 py-3.5">Category</th>
+              <th class="px-6 py-3.5">Description</th>
+              <th class="px-6 py-3.5 text-right">Amount</th>
+              <th class="px-6 py-3.5 text-right">Balance</th>
+            </tr>
+          </thead>
+          <tbody id="txns-tbody" class="divide-y divide-slate-100">
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    let currentStatementId = null;
+    let allTransactions = [];
+
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('file-input');
+    const fileStatus = document.getElementById('file-status-badge');
+    const activeSessionLabel = document.getElementById('active-session-label');
+    const summarySection = document.getElementById('summary-section');
+    const txnsContainer = document.getElementById('txns-table-container');
+
+    dropzone.addEventListener('click', () => fileInput.click());
+    dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('border-indigo-500', 'bg-indigo-50/30'); });
+    dropzone.addEventListener('dragleave', () => { dropzone.classList.remove('border-indigo-500', 'bg-indigo-50/30'); });
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('border-indigo-500', 'bg-indigo-50/30');
+      if (e.dataTransfer.files.length) uploadFile(e.dataTransfer.files[0]);
+    });
+
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files.length) uploadFile(fileInput.files[0]);
+    });
+
+    async function uploadFile(file) {
+      fileStatus.textContent = 'Processing statement...';
+      fileStatus.className = 'text-xs font-medium px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 animate-pulse';
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        const resp = await fetch('/upload', { method: 'POST', body: formData });
+        if (!resp.ok) {
+          const err = await resp.json();
+          throw new Error(err.detail || 'Upload failed');
+        }
+        const data = await resp.json();
+        onUploadSuccess(data);
+      } catch (err) {
+        alert('Upload Error: ' + err.message);
+        fileStatus.textContent = 'Upload Failed';
+        fileStatus.className = 'text-xs font-medium px-2.5 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200';
+      }
+    }
+
+    async function loadSample(filename) {
+      fileStatus.textContent = 'Loading sample ' + filename + '...';
+      try {
+        const fileResp = await fetch('/sample_data/' + filename);
+        if (!fileResp.ok) throw new Error('Sample not found on server');
+        const blob = await fileResp.blob();
+        const file = new File([blob], filename);
+        await uploadFile(file);
+      } catch (e) {
+        alert('Could not load sample: ' + e.message);
+      }
+    }
+
+    function onUploadSuccess(data) {
+      currentStatementId = data.file_id;
+      fileStatus.textContent = `${data.filename} (${data.total_transactions} txns)`;
+      fileStatus.className = 'text-xs font-medium px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200';
+      activeSessionLabel.textContent = `Statement ID: ${data.file_id}`;
+
+      // Update summary cards
+      const s = data.summary;
+      document.getElementById('stat-credits').textContent = '$' + s.total_credits.toLocaleString('en-US', { minimumFractionDigits: 2 });
+      document.getElementById('stat-credit-count').textContent = `${s.credit_count} credits`;
+
+      document.getElementById('stat-debits').textContent = '$' + s.total_debits.toLocaleString('en-US', { minimumFractionDigits: 2 });
+      document.getElementById('stat-debit-count').textContent = `${s.debit_count} expenses`;
+
+      const net = s.net_cash_flow;
+      const netEl = document.getElementById('stat-net');
+      netEl.textContent = (net >= 0 ? '+$' : '-$') + Math.abs(net).toLocaleString('en-US', { minimumFractionDigits: 2 });
+      netEl.className = net >= 0 ? 'text-2xl font-bold text-emerald-600 mt-2' : 'text-2xl font-bold text-rose-600 mt-2';
+      document.getElementById('stat-net-badge').textContent = net >= 0 ? 'Net Surplus' : 'Net Deficit';
+
+      document.getElementById('stat-total-txns').textContent = s.transaction_count;
+      document.getElementById('stat-dates').textContent = `${s.start_date || 'N/A'} → ${s.end_date || 'N/A'}`;
+
+      summarySection.classList.remove('hidden');
+
+      // Fetch all transactions for table
+      fetchTransactions();
+    }
+
+    async function fetchTransactions() {
+      if (!currentStatementId) return;
+      try {
+        const resp = await fetch(`/transactions?statement_id=${currentStatementId}&limit=100`);
+        const data = await resp.json();
+        allTransactions = data.transactions;
+        renderTransactions(allTransactions);
+        txnsContainer.classList.remove('hidden');
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function renderTransactions(list) {
+      const tbody = document.getElementById('txns-tbody');
+      tbody.innerHTML = '';
+
+      if (!list.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-slate-400">No transactions match the filter.</td></tr>';
+        return;
+      }
+
+      list.forEach(t => {
+        const isCredit = t.transaction_type === 'CREDIT';
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50/80 transition';
+        tr.innerHTML = `
+          <td class="px-6 py-3 text-slate-500 whitespace-nowrap">${t.date}</td>
+          <td class="px-6 py-3 font-medium text-slate-900">${t.merchant}</td>
+          <td class="px-6 py-3"><span class="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 text-slate-600">${t.category}</span></td>
+          <td class="px-6 py-3 text-slate-500 truncate max-w-xs" title="${t.description}">${t.description}</td>
+          <td class="px-6 py-3 text-right font-semibold whitespace-nowrap ${isCredit ? 'text-emerald-600' : 'text-slate-900'}">
+            ${isCredit ? '+' : '-'}$${t.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+          </td>
+          <td class="px-6 py-3 text-right text-slate-400 whitespace-nowrap">${t.balance !== null ? '$' + t.balance.toLocaleString('en-US', { minimumFractionDigits: 2 }) : '-'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function filterTransactions() {
+      const q = document.getElementById('search-filter').value.toLowerCase();
+      const type = document.getElementById('type-filter').value;
+
+      const filtered = allTransactions.filter(t => {
+        const matchQ = !q || t.merchant.toLowerCase().includes(q) || t.description.toLowerCase().includes(q) || t.category.toLowerCase().includes(q);
+        const matchType = !type || t.transaction_type === type;
+        return matchQ && matchType;
+      });
+      renderTransactions(filtered);
+    }
+
+    function setQuery(text) {
+      document.getElementById('question-input').value = text;
+      document.getElementById('ask-form').dispatchEvent(new Event('submit'));
+    }
+
+    document.getElementById('ask-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const input = document.getElementById('question-input');
+      const question = input.value.trim();
+      if (!question) return;
+
+      if (!currentStatementId) {
+        alert('Please upload a bank statement or click one of the sample statement buttons first!');
+        return;
+      }
+
+      const btn = document.getElementById('ask-btn');
+      const btnText = document.getElementById('ask-btn-text');
+      const spinner = document.getElementById('ask-spinner');
+      const responseContainer = document.getElementById('response-container');
+
+      btn.disabled = true;
+      btnText.textContent = 'Calculating...';
+      spinner.classList.remove('hidden');
+
+      try {
+        const resp = await fetch('/ask', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question: question, session_id: currentStatementId })
+        });
+
+        if (!resp.ok) {
+          const err = await resp.json();
+          throw new Error(err.detail || 'Query failed');
+        }
+
+        const data = await resp.json();
+
+        // Render response
+        document.getElementById('answer-text').innerHTML = formatMarkdown(data.answer);
+
+        // Render tool badges
+        const badges = document.getElementById('tools-badge-container');
+        badges.innerHTML = data.tools_used.map(t => 
+          `<span class="px-2 py-0.5 rounded text-[10px] font-mono bg-indigo-50 text-indigo-700 border border-indigo-200">${t}</span>`
+        ).join('');
+
+        // Validation badge
+        const audit = document.getElementById('audit-badge');
+        if (data.validation && data.validation.grounded_in_tools) {
+          audit.textContent = '✓ 100% Grounded';
+          audit.className = 'inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200';
+        } else {
+          audit.textContent = '⚠ Audited';
+          audit.className = 'inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200';
+        }
+
+        // Raw calculations
+        document.getElementById('raw-calc-output').textContent = JSON.stringify(data.calculation_results, null, 2);
+
+        responseContainer.classList.remove('hidden');
+        responseContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } catch (err) {
+        alert('Analysis Error: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btnText.textContent = 'Ask AI';
+        spinner.classList.add('hidden');
+      }
+    });
+
+    function formatMarkdown(text) {
+      if (!text) return '';
+      return text
+        .replace(/### (.*?)\n/g, '<h4 class="font-bold text-slate-900 text-sm mt-3 mb-1">$1</h4>')
+        .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-slate-900">$1</strong>')
+        .replace(/- (.*?)\n/g, '<li class="ml-4 list-disc text-slate-700 my-0.5">$1</li>')
+        .replace(/\n\n/g, '<div class="h-2"></div>');
+    }
+  </script>
+</body>
+</html>
